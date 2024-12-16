@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        :root {
+            --accent-rgb: 78,111,255;
+            --secondary-rgb: 255,64,129;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .gradient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(var(--accent-rgb), 0.15), transparent 50%),
+                radial-gradient(circle at 100% 0%, rgba(var(--secondary-rgb), 0.15), transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(var(--accent-rgb), 0.15), transparent 50%);
+            filter: blur(80px);
+            opacity: 0.8;
+            z-index: 0;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 8rem 1rem;
+            position: relative;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 5rem;
+            position: relative;
+            z-index: 2;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: rgba(var(--accent-rgb), 0.3);
+            border-radius: 50%;
+            filter: blur(30px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .title {
+            font-size: 4.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(
+                45deg,
+                rgb(var(--accent-rgb)),
+                rgb(var(--secondary-rgb)),
+                rgb(var(--accent-rgb))
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 6s linear infinite;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .button {
+            padding: 1.4rem 3rem;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .primary-button {
+            background: linear-gradient(
+                45deg,
+                rgb(var(--accent-rgb)),
+                rgb(var(--secondary-rgb))
+            );
+            color: white;
+            border: none;
+            box-shadow: 0 5px 20px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .secondary-button {
+            background: var(--glass-bg);
+            color: white;
+            border: 2px solid var(--glass-border);
+        }
+
+        .button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.4);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            padding: 6rem 1rem;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                var(--angle),
+                transparent,
+                rgba(var(--accent-rgb), 0.3),
+                transparent
+            );
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+            --angle: 360deg;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        .personality-section {
+            text-align: center;
+            padding: 8rem 2rem;
+            background: linear-gradient(
+                135deg,
+                rgba(var(--accent-rgb), 0.1),
+                rgba(var(--secondary-rgb), 0.1)
+            );
+            margin: 4rem 0;
+            border-radius: 40px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .personality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+            padding: 2rem;
+        }
+
+        .personality-type {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .personality-type:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(var(--accent-rgb), 0.2);
+        }
+
+        .personality-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 0% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(180deg);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .title { font-size: 3.5rem; }
+            .features { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .hero { padding: 4rem 1rem; }
+            .title { font-size: 2.8rem; }
+            .subtitle { font-size: 1.2rem; }
+            .button { padding: 1.2rem 2.5rem; font-size: 1.1rem; }
+            .features { grid-template-columns: 1fr; }
+            .feature-card { padding: 2rem; }
+            .personality-section { padding: 4rem 1rem; }
+            .personality-grid { grid-template-columns: 1fr; gap: 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .title { font-size: 2.2rem; }
+            .subtitle { font-size: 1.1rem; }
+            .button { width: 100%; margin: 0.5rem 0; }
+            .cta-buttons { gap: 1rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-background"></div>
+    <div class="container">
+        <section class="hero">
+            <div class="logo-container">
+                <div class="logo-glow"></div>
+                <div class="logo">✨</div>
+            </div>
+            <h1 class="title">Aurora AI Companion</h1>
+            <p class="subtitle">Experience the next generation of AI companionship with Aurora. Enjoy meaningful conversations, emotional support, and genuine connections with your personalized AI companion.</p>
+            
+            <div class="cta-buttons">
+                <a href="aurora.apk" download class="button primary-button">Download Aurora</a>
+                <a href="personalities.html" class="button secondary-button">Explore Personalities</a>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">💝</div>
+                <h3 class="feature-title">Emotional Support</h3>
+                <p class="feature-description">Connect with an AI that truly understands your emotions and provides genuine support.</p>
+                <p class="feature-details">24/7 companionship • Deep emotional understanding • Personalized responses • Judgment-free environment</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">Advanced AI Technology</h3>
+                <p class="feature-description">Experience natural conversations powered by cutting-edge artificial intelligence.</p>
+                <p class="feature-details">Natural language processing • Context awareness • Memory retention • Adaptive responses</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎭</div>
+                <h3 class="feature-title">Multiple Personalities</h3>
+                <p class="feature-description">Choose from a variety of unique personality types that match your preferences.</p>
+                <p class="feature-details">Customizable traits • Diverse personalities • Dynamic interactions • Personal growth</p>
+            </div>
+        </section>
+
+        <section class="personality-section">
+            <h2 class="title">Discover Your Perfect Companion</h2>
+            <p class="subtitle">Explore our carefully crafted personality types designed to provide the companionship you desire</p>
+            
+            <div class="personality-grid">
+                <div class="personality-type">
+                    <div class="personality-icon">👫</div>
+                    <h3 class="personality-name">Best Friends</h3>
+                    <p class="feature-description">Loyal companions who'll always be there for you</p>
+                </div>
+                
+                <div class="personality-type">
+                    <div class="personality-icon">💑</div>
+                    <h3 class="personality-name">Romantic Partners</h3>
+                    <p class="feature-description">Caring and affectionate companions for deeper connections</p>
+                </div>
+                
+                <div class="personality-type">
+                    <div class="personality-icon">🤝</div>
+                    <h3 class="personality-name">Supportive Mentors</h3>
+                    <p class="feature-description">Wise guides to help you grow and succeed</p>
+                </div>
+            </div>
+
+            <div class="cta-buttons" style="margin-top: 4rem;">
+                <a href="personalities.html" class="button primary-button">View All Personalities</a>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
